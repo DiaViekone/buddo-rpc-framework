@@ -1,0 +1,148 @@
+<!--
+    ###日志级别###
+    日志等级一般分为5个等级(依次递增)
+    debug   开发时需要关注的一些信息
+    info    程序正常运转的一些关键点的信息
+    warn    一些异常情况, 不影响程序的逻辑, 但需要提醒开发人员
+    error   一些错误提示, 需要中断操作的错误
+    fatal   严重错误, 基本上服务就挂掉了
+
+    设置日志等级后将不会打印出低级别的日志, 例如设置为error, 则debug和info将不再打印
+    一般我们在开发的时候将等级设置为debug, 正式环境设置为info
+
+    还有两个特殊的等级
+    ALL     输出全部日志
+    OFF     关闭全部日志
+
+    可以根据自己需求添加删除配置。
+-->
+<configuration scan="true" scanPeriod="5 seconds">
+    <contextName>heron</contextName>
+    <!-- 项目名 -->
+    <property name="appName" value="app"/>
+    <!-- 日志目录（idea工程./logs表示当前项目根目录下logs文件夹，不存在会自动创建，推荐写绝对路径） -->
+    <property name="logPath" value="./logs"/>
+    <!-- 格式: 时间 [线程名] 日志级别 类缩写限定名 - 日志内容 -->
+    <property name="dev-pattern" value="%white(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{5}) - %cyan(%msg%n)"/>
+    <!-- 格式: 时间 [线程名] 日志级别 类全限定名 - 日志内容 -->
+    <!-- 注意: 日志写入文件时不能使用彩色日志样式 %logger{26}中的数字，0为单类名、5为包缩写全限定名、26为全限定名 -->
+    <property name="prod-pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{5} - %msg%n"/>
+
+    <!-- 控制台日志 -->
+    <!-- <appender>
+         name: appender日志打印组件的名称
+         class: 实现类（可以继承接口自定义）
+     -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${dev-pattern}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- error级别滚动日志 -->
+    <appender name="errorRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${appName}/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${appName}/%d{yyyy-MM-dd}/${appName}-error-%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${prod-pattern}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- info级别滚动日志 -->
+    <appender name="infoRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${appName}/info.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${appName}/%d{yyyy-MM-dd}/${appName}-info-%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${prod-pattern}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- debug级别滚动日志 -->
+    <appender name="debugRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${appName}/debug.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${appName}/%d{yyyy-MM-dd}/${appName}-debug-%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${prod-pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 开启滚动日志模式（生产） -->
+    <!-- <logger>
+         name: 项目包名/类名（栗子: io.github.yuriua）,不写打印所有，开发时建议随便写个字符串，不然启动时会打印一堆信息！
+         level: 记录的日志等级（按照需求来）
+         additivity: 是否将打印信息向上传递，默认true，必须无脑设置false以避免重复打印浪费硬盘空间。不设置或设置true会同时在控制台打印和写入日志文件
+    -->
+    <!-- <appender-ref>
+         ref: 引用我们定义的appender（日志打印组件）
+    -->
+    <logger name="项目包名/类名" level="debug" additivity="true">
+        <!-- "errorRolling" appender: error级别的滚动日志打印组件 -->
+        <appender-ref ref="errorRolling"/>
+        <!-- "infoRolling" appender: info级别的滚动日志打印组件 -->
+        <appender-ref ref="infoRolling"/>
+        <!-- "debugRolling" appender: debug级别的滚动日志打印组件 -->
+        <appender-ref ref="debugRolling"/>
+    </logger>
+
+    <!--spring data mongo输出查询语句-->
+    <logger name="org.springframework.data.mongodb.core" level="debug" additivity="false">
+        <appender-ref ref="debugRolling"/>
+    </logger>
+
+    <!-- sql语句控制台输出格式 -->
+    <appender name="SQL_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!--配置一些sql打印日志， 用SQL_CONSOLE的格式打印-->
+    <logger name="io.github.yuriua.mapper" level="DEBUG" additivity="false" >
+        <!-- 指定appender -->
+        <appender-ref ref="SQL_CONSOLE" />
+    </logger>
+    <logger name="org.springframework.data.mongodb.core.MongoTemplate" level="DEBUG" />
+
+
+    <!-- 最高级别日志 -->
+    <root level="debug">
+        <!-- "STDOUT" appender: 将日志打印到控制台-->
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

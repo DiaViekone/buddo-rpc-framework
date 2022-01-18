@@ -1,0 +1,7 @@
+io\github\yuriua\buddo\proxy\test\TargetInterface.class
+io\github\yuriua\buddo\remoting\test\RpcNettyClientTest.class
+io\github\yuriua\buddo\remoting\test\RpcNettyServerTest.class
+io\github\yuriua\buddo\proxy\test\InvocationHandlerImpl.class
+io\github\yuriua\buddo\proxy\test\Test.class
+io\github\yuriua\buddo\proxy\test\Target.class
+io\github\yuriua\buddo\proxy\test\ProxyTest.class

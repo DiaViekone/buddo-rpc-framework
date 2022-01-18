@@ -1,0 +1,3 @@
+protostuff=io.github.yuriua.buddo.serialize.protostuff.ProtostuffSerializer
+kryo=io.github.yuriua.buddo.serialize.kyro.KryoSerializer
+jdk=io.github.yuriua.buddo.serialize.jdk.JDKSerializer
