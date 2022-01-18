@@ -1,3 +1,5 @@
+使用Netty开发的一款RPC框架，有详细中文注释，非常便于新手学习理解Netty使用
+
 # buddo-rpc-framework
 
 # 概述
