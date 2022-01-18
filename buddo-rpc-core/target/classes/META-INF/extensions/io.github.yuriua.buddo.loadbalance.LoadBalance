@@ -1,2 +1,0 @@
-loadBalance=io.github.yuriua.buddo.loadbalance.loadbalancer.RandomLoadBalance
-
